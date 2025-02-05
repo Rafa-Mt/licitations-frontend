@@ -1,5 +1,5 @@
 import streamlit as st
-from fetch import login as fetch_login, register as fetch_register,session
+from services.fetch import login as fetch_login, register as fetch_register,session
 
 def login(username: str, password: str) -> bool:
     response = fetch_login(username, password)

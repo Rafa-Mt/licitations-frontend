@@ -1,7 +1,7 @@
 import requests
 import streamlit as st
 
-BASE_URL = st.secrets["backend_url"]
+BASE_URL = st.secrets["backend"]["backend_url"]
 session = requests.Session()
 
 def register(username, password, email):
