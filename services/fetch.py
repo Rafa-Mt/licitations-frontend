@@ -4,7 +4,7 @@ import streamlit as st
 BASE_URL = st.secrets["backend_url"]
 session = requests.Session()
 
-def auth_register(username, password, email):
+def register(username, password, email):
     url = f"{BASE_URL}/auth/register"
     payload = {
         "username": username,
@@ -14,7 +14,7 @@ def auth_register(username, password, email):
     response = session.post(url, json=payload)
     return response.json()
 
-def auth_login(username, password):
+def login(username, password):
     url = f"{BASE_URL}/auth/login"
     payload = {
         "username": username,
@@ -23,7 +23,7 @@ def auth_login(username, password):
     response = session.post(url, json=payload)
     return response.json()
 
-def auth_logout():
+def logout():
     url = f"{BASE_URL}/auth/logout"
     response = session.post(url)
     return response.json()
@@ -46,6 +46,8 @@ def send_text(text, aes_key_path=None, application_path=None):
     
     return response.json()
 
+
+# get all the licitations
 def get_applications():
     url = f"{BASE_URL}/application/"
     response = session.get(url)
