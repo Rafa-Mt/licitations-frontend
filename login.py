@@ -4,7 +4,7 @@ import services.auth as auth
 cookies = st.context.cookies
 
 if cookies.get("token"):
-    st.navigation("main")
+    st.switch_page("./pages/main.py")
 
 st.session_state.sidebar_visible = False
 
