@@ -1,54 +1,44 @@
-import requests
-import streamlit as st
+from supabase_client import supabase
+import os
+import time
 
-BASE_URL = st.secrets["backend"]["backend_url"]
-session = requests.Session()
+def register(email, password):
+    supabase.auth.sign_up(email=email, password=password)
 
-def register(username, password, email):
-    url = f"{BASE_URL}/auth/register"
-    payload = {
-        "username": username,
-        "password": password,
-        "email": email
-    }
-    response = session.post(url, json=payload)
-    return response.json()
 
-def login(username, password):
-    url = f"{BASE_URL}/auth/login"
-    payload = {
-        "username": username,
-        "password": password
-    }
-    response = session.post(url, json=payload)
-    return response.json()
+def login(email, password):
+    supabase.auth.sign_in(email=email, password=password)
+
+
 
 def logout():
-    url = f"{BASE_URL}/auth/logout"
-    response = session.post(url)
-    return response.json()
+    supabase.auth.sign_out()
 
-def send_text(text, aes_key_path=None, application_path=None):
-    url = f"{BASE_URL}/send/text"
-    data = {"text": text}
-    files = {}
+def send(encrypted_file, file_title, file_description, aes_key):
+    try:
 
-    if aes_key_path:
-        files["aes_key"] = open(aes_key_path, 'rb')
-    if application_path:
-        files["application"] = open(application_path, 'rb')
+        dir_name = f'files/{file_title}-' + str(time.time())
+        os.mkdir(dir_name)
+        with open(f'files/{dir_name}/licitation', 'wb') as f:
+            f.write(encrypted_file)
+        with open(f'files/{dir_name}/key', 'w') as f:
+            f.write(aes_key)
 
-    response = session.post(url, data=data, files=files)
-    
-
-    for file in files.values():
-        file.close()
-    
-    return response.json()
+        result = supabase.table('application').insert([
+            { 'title': file_title, 'description': file_description, 'dir': dir_name, 'state_id': 1 }
+        ]).execute()
+        
+        if result.get('error'):
+            raise Exception(result.get('error'))
+        return True
+    except Exception as e:
+        print(e)
+        return False
 
 
 # get all the licitations
-def get_applications():
-    url = f"{BASE_URL}/application/"
-    response = session.get(url)
-    return response.json()
+def get_licitations():
+    result = supabase.table('application').select().execute()
+    return result.get('data')
+
+
