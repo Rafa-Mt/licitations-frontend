@@ -3,13 +3,15 @@ from services.fetch import login as fetch_login, register as fetch_register,sess
 
 def login(username: str, password: str) -> bool:
     response = fetch_login(username, password)
-    if response.get("message") == "Login exitoso":
+
+    if  response.get("message") == "Login exitoso.":
         token = session.cookies.get("token")
-        if token:
+        if not token:
             save_token(token)
-            st.toast("Logged in")
-            st.switch_page("./pages/main.py")
-            return True
+        st.toast("Logged in")
+        st.switch_page("./pages/main.py")
+        return True
+    
     st.error("Login failed")
     return False
 
