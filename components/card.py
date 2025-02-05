@@ -8,8 +8,8 @@ def card(name: str, description: str, state: str):
     left, right = container.columns([0.8, 0.2])
     left.subheader(description)
     match state:
-        case "approved": right.success(f"Approved", icon=':material/check_circle')
-        case "rejected": right.error(f"Rejected")
-        case "pending": right.info(f"Pending")
+        case "approved": right.success(f"Approved", icon=':material/check_circle:')
+        case "rejected": right.error(f"Rejected", icon=':material/cancel:')
+        case "pending": right.info(f"Pending", icon=':material/more_horiz:')
 
     return container
