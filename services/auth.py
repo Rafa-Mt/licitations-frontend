@@ -1,26 +1,36 @@
 import streamlit as st
-from services.fetch import login as fetch_login, register as fetch_register,session
+# from services.fetch import login as fetch_login, register as fetch_register, session
+from supabase import Client, AuthApiError
 
-def login(username: str, password: str) -> bool:
-    response = fetch_login(username, password)
-    if response.get("message") == "Login exitoso":
-        token = session.cookies.get("token")
-        if token:
-            save_token(token)
-            st.toast("Logged in")
-            st.switch_page("./pages/main.py")
-            return True
-    st.error("Login failed")
-    return False
+def login(email: str, password: str, client: Client) -> bool:
+    try:
+        response = client.auth.sign_in_with_password({"email": email, "password": password})
+        save_token(response.session.access_token)
+        user_id = response.user.id
+        print(user_id)
+        user_type = client.table("user_role") \
+            .select("role_id, role(description)") \
+            .eq("user_id", user_id) \
+            .execute() \
+            .data[0]["role"]["description"]
+        
+        print(user_type)
 
-def register(username: str, email: str, password: str) -> bool:
-    response = fetch_register(username, password, email)
-    if response.get("mensaje") == "Usuario registrado correctamente":
-        st.toast("Registered")
         return True
-    else:
-        st.error("Registration failed")
+    except AuthApiError:
+        st.error("Invalid Credentials")
         return False
+
+
+def register(username: str, email: str, password: str, client: Client) -> bool:
+    try:
+        response = client.auth.sign_up({"email": email, "password": password})
+        save_token(response.session.access_token)
+        return True
+    except AuthApiError:
+        st.error("Invalid Credentials")
+        return False
+
 
 def save_token(token):
     st.session_state['token'] = token
