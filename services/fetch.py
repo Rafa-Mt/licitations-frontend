@@ -3,6 +3,7 @@ from supabase import AuthApiError
 import os
 import time
 import streamlit as st
+from supabase import AuthApiError,AuthRetryableError
 
 def register(email: str, password: str) -> str:
     try:
@@ -27,6 +28,22 @@ def login(email: str, password: str) -> tuple[str, str]:
         return (user_type, response.session.access_token)
     except:
         raise AuthApiError()
+
+def get_user_type():
+    
+    user_id = supabase.auth.get_user(st.session_state['token']).user.id
+    
+
+    user_type = supabase.table("user_role")\
+        .select("role_id")\
+        .eq("user_id", user_id)\
+        .execute() 
+        
+    print(f"resutl {user_type}")
+    
+    return(user_type)
+
+
 
 
 def logout():
@@ -64,16 +81,53 @@ def send(encrypted_file, file_title, file_description, aes_key):
         print(e)
         return False
 
-def get_user_licitations():
-    pass
+def get_user_licitations(user_id):
+    try:
+        result = supabase.table("application") \
+            .select('*') \
+            .filter('user_id', 'eq', user_id) \
+            .execute()
+        if result.status_code == 200:
+            return result.data
+        else:
+            print(f"Failed to fetch licitations: {result}")
+            return None
+    except Exception as e:
+        print(f"Error fetching licitations: {e}")
+        return None
+
 
 # get all the licitations
 def get_licitations():
-    user_id = supabase.auth.get_user(st.session_state['token']).user.id
-    result = supabase.table("application") \
-        .select('title, description, file_dir, aes_key_dir') \
-        .filter('state_id', 'eq', 1) \
-        .execute()
-    return result.data
+    try:
+        result = supabase.table("application") \
+            .select('id,title, description, file_dir, aes_key_dir') \
+            .filter('state_id', 'eq', 1) \
+            .execute()
+        return result.data
+    except AuthRetryableError:
+        st.error("SSL handshake timed out. Please try again.")
+
+
+
+def update_state(licitation_id, new_state):
+    print("xxxx")
+    user_type=get_user_type()
+    
+    print(f"user_type: {user_type}")
+    if user_type == 2:
+        result = supabase.table("application") \
+            .update({'state_id': new_state}) \
+            .filter('id', 'eq', licitation_id) \
+            .execute()
+        if result.status_code == 200:
+            print("State updated successfully")
+        else:
+            print("failed")
+    else:
+        print("you cant acces")
+        
+        
+    
 
 

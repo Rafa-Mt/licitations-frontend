@@ -22,4 +22,5 @@ cards = {
 }
 
 for item in licitations:
-    admin_card(item['title'], item['description'], item['file_dir'], item['aes_key_dir'])
+    #print(f"{item['id']}\n")
+    admin_card(item['id'],item['title'], item['description'], item['file_dir'], item['aes_key_dir'])
