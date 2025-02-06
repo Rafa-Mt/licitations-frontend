@@ -1,8 +1,12 @@
 import streamlit as st
 from components.admin_card import admin_card
 from services.supabase_client import supabase
+from services.fetch import get_licitations
 
 st.header("Admin's Licitations")
+
+licitations = get_licitations()
+
 
 
 cards = {
@@ -11,6 +15,5 @@ cards = {
     "lict3": "pending"
 }
 
-
-admin_card("title", "ayuda", "./file/licitacion/out.bin", "./file/licitacion/aeskey_encrypted.bin")
-    
+for item in licitations:
+    admin_card(item['title'], item['description'], item['file_dir'], item['aes_key_dir'])

@@ -70,11 +70,9 @@ def get_user_licitations():
 # get all the licitations
 def get_licitations():
     user_id = supabase.auth.get_user(st.session_state['token']).user.id
-    result = supabase.table("applications") \
-        .select('title, description, file_dir, aes_key_dir, state_id, state(state_id: id), user_id, auth.users(user_id: id)') \
+    result = supabase.table("application") \
+        .select('title, description, file_dir, aes_key_dir') \
         .execute()
-    
-    print(result)
-    return result["data"]
+    return result.data
 
 
