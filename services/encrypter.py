@@ -5,8 +5,6 @@ def decrypt_file(filepath: str, key_path: str) -> bytes:
     print(f"decrypting {filepath}  {key_path}")
     os.system(f".\services\encrypter.exe -d {filepath} private.pem {key_path}")
 
-
-
     out_file = "out.txt"
 
     if not os.path.exists(out_file):

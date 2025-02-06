@@ -14,5 +14,6 @@ def send_modal():
             if all([title, description, encrypted_file, aes_key_file]):
                 fetch.send(encrypted_file, title, description, aes_key_file)
                 st.rerun()
+                st.toast("Licitation sended successfully")
             else:
                 st.error("Please fill out all fields")

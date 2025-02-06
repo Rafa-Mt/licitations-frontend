@@ -4,6 +4,7 @@ from services.supabase_client import supabase
 
 st.header("Admin's Licitations")
 
+
 cards = {
     "lict1": "approved",
     "lict2": "rejected",

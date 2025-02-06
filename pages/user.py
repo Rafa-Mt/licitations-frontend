@@ -10,8 +10,15 @@ cards = {
 
 left, right = st.columns(2)
 
-if left.button("Get Encryption Key", use_container_width=True):
-    pass
+with open("./keys/public.pem", "+r") as key:
+    left.download_button(
+        "Get Encryption Key", 
+        data=key, 
+        use_container_width=True,
+        file_name="public.pem",
+        mime="application/octet-stream"
+    )
+    
 
 if right.button("Send Licitation", use_container_width=True):
     send_modal()

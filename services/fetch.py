@@ -36,19 +36,27 @@ def logout():
 
 def send(encrypted_file, file_title, file_description, aes_key):
     try:
-        dir_name = f'files/{file_title}-' + str(time.time())
+        dir_name = f'./files/{file_title}-' + str(time.time())
         os.mkdir(dir_name)
-        with open(f'files/{dir_name}/licitation', 'wb') as f:
-            f.write(encrypted_file)
-        with open(f'files/{dir_name}/key', 'w') as f:
-            f.write(aes_key)
+        file_dir = f'{dir_name}/licitation.bin' 
+        with open(file_dir, 'wb') as f:
+            f.write(encrypted_file.read())
 
-        user_id = supabase.auth.get_user().user.id
-        result = supabase.table('application').insert([
-            { 'title': file_title, 'description': file_description, 'dir': dir_name, 'state_id': 1, 'user_id': user_id }
-        ]).execute()
+        key_dir = f'{dir_name}/key.bin' 
+        with open(key_dir, 'wb') as f:
+            f.write(aes_key.read())
+
+        user_id = supabase.auth.get_user(st.session_state['token']).user.id
+        result = supabase.table('application').insert([{ 
+            'title': file_title, 
+            'description': file_description, 
+            'file_dir': file_dir, 
+            'aes_key_dir': key_dir, 
+            'state_id': 1, 
+            'user_id': user_id 
+        }]).execute()
         
-        if result.get('error'):
+        if result['error']:
             os.rmdir(dir_name)
             raise Exception(result.get('error'))
         return True
