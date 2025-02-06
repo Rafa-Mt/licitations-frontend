@@ -11,7 +11,7 @@ def admin_card(name: str, description: str, filepath: str, key_path: str):
     left.subheader(description)
     center.button("Change State", on_click=approve_dialog, key=f"{name}-{description}-set")
 
-    if right.button("", icon='icon=":material/download_2:",', key=f"{name}-{description}-download"):
+    if right.button("", icon=':material/download_2:', key=f"{name}-{description}-download"):
         download_dialog(filepath, key_path, name, description)
        
 
