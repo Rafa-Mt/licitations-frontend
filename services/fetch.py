@@ -115,17 +115,14 @@ def update_state(licitation_id, new_state):
     user_type=get_user_type()
     
     print(f"user_type: {user_type}")
-    if user_type == 2:
-        result = supabase.table("application") \
-            .update({'state_id': new_state}) \
-            .filter('id', 'eq', licitation_id) \
-            .execute()
-        if result.status_code == 200:
-            print("State updated successfully")
-        else:
-            print("failed")
-    else:
-        print("you cant acces")
+
+
+
+    result = supabase.table("application") \
+        .update({'state_id': new_state}) \
+        .filter('id', 'eq', licitation_id) \
+        .execute()
+    
         
         
     
