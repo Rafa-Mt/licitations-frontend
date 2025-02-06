@@ -10,4 +10,5 @@ supabase: Client = create_client(URL, KEY,
     postgrest_client_timeout=10,
     storage_client_timeout=10,
     schema="public",
-  ))
+  )
+)

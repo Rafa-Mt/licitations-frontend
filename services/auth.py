@@ -1,31 +1,23 @@
 import streamlit as st
-# from services.fetch import login as fetch_login, register as fetch_register, session
-from supabase import Client, AuthApiError
+import services.fetch as fetch
+from supabase import AuthApiError
+from services.supabase_client import supabase
 
-def login(email: str, password: str, client: Client) -> bool:
+def login(email: str, password: str) -> None:
     try:
-        response = client.auth.sign_in_with_password({"email": email, "password": password})
-        save_token(response.session.access_token)
-        user_id = response.user.id
-        print(user_id)
-        user_type = client.table("user_role") \
-            .select("role_id, role(description)") \
-            .eq("user_id", user_id) \
-            .execute() \
-            .data[0]["role"]["description"]
-        
-        print(user_type)
-
-        return True
+        user_type, token = fetch.login(email, password)
+        st.session_state['token'] = token
+        st.switch_page(f"./pages/{user_type}.py")
     except AuthApiError:
         st.error("Invalid Credentials")
-        return False
 
-
-def register(username: str, email: str, password: str, client: Client) -> bool:
+def register(email: str, password: str) -> None:
     try:
-        response = client.auth.sign_up({"email": email, "password": password})
-        save_token(response.session.access_token)
+        print('registers before')
+        token = fetch.register(email, password)
+        print('registers after')
+        st.session_state['token'] = token
+        st.switch_page("./pages/user.py")
         return True
     except AuthApiError:
         st.error("Invalid Credentials")
