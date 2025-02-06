@@ -18,3 +18,6 @@ if right.button("Send Licitation", use_container_width=True):
 
 for title, state in cards.items():
     card(title, "Asdasd", state)
+
+if len(cards) == 0:
+    st.subheader("You don't have any licitation... Create one.")
