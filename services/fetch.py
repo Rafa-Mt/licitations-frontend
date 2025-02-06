@@ -1,17 +1,14 @@
 from services.supabase_client import supabase
+from supabase import AuthApiError
 import os
 import time
 import streamlit as st
 
 def register(email: str, password: str) -> str:
     try:
-        print("ASD")
         register_response = supabase.auth.sign_up({"email": email, "password": password})
-        print("FGH")
-        print(register_response)
         user_id = register_response.user.id
-        rpc_response = supabase.rpc("insert_user_role", {"p_user_id": user_id}).execute()
-        print(rpc_response)
+        supabase.rpc("insert_user_role", {"p_user_id": user_id}).execute()
         
         return register_response.session.access_token
     except Exception as e:
@@ -20,20 +17,21 @@ def register(email: str, password: str) -> str:
 def login(email: str, password: str) -> tuple[str, str]:
     response = supabase.auth.sign_in_with_password({"email": email, "password": password})
     user_id = response.user.id
-    print(user_id)
-    user_type = supabase.table("user_role") \
-        .select("role_id, role(description)") \
-        .eq("user_id", user_id) \
-        .execute() \
-        .data[0]["role"]["description"]
-    
-    print(user_type)
-    return (user_type, response.session.access_token)
+    try:
+        user_type = supabase.table("user_role") \
+            .select("role_id, role(description)") \
+            .eq("user_id", user_id) \
+            .execute() \
+            .data[0]["role"]["description"]
+        print(user_type)
+        return (user_type, response.session.access_token)
+    except:
+        raise AuthApiError()
 
 
 def logout():
     supabase.auth.sign_out()
-    st.session_state.popitem("key")
+    st.session_state.popitem("token")
 
 
 def send(encrypted_file, file_title, file_description, aes_key):
@@ -45,21 +43,26 @@ def send(encrypted_file, file_title, file_description, aes_key):
         with open(f'files/{dir_name}/key', 'w') as f:
             f.write(aes_key)
 
+        user_id = supabase.auth.get_user().user.id
         result = supabase.table('application').insert([
-            { 'title': file_title, 'description': file_description, 'dir': dir_name, 'state_id': 1 }
+            { 'title': file_title, 'description': file_description, 'dir': dir_name, 'state_id': 1, 'user_id': user_id }
         ]).execute()
         
         if result.get('error'):
+            os.rmdir(dir_name)
             raise Exception(result.get('error'))
         return True
     except Exception as e:
         print(e)
         return False
 
+def get_user_licitations():
+    pass
 
 # get all the licitations
 def get_licitations():
-    result = supabase.table('application').select().execute()
+    result = supabase.table('title, description, file_dir, aes_key_dir, state_id, state(state_id: id), user_id, auth.users(user_id: id)').select("").execute()
+    print(result)
     return result.get('data')
 
 
