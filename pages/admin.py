@@ -10,5 +10,6 @@ cards = {
     "lict3": "pending"
 }
 
-for title, state in cards.items():
-    admin_card(title, "Asdasd"*32, "files/licitation", "files/key")
+
+admin_card("title", "ayuda", "./file/licitacion/out.bin", "./file/licitacion/aeskey_encrypted.bin")
+    
