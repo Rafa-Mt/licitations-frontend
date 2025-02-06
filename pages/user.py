@@ -1,6 +1,10 @@
 import streamlit as st
 from components.card import card
 from components.send_dialog import send_modal
+from services.auth import check_token
+
+check_token()
+
 
 cards = {
     "lict1": "approved",

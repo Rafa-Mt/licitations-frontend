@@ -1,7 +1,6 @@
 import streamlit as st
 import services.fetch as fetch
-from supabase import AuthApiError
-from services.supabase_client import supabase
+from supabase import AuthApiError,AuthRetryableError
 
 def login(email: str, password: str) -> None:
     try:
@@ -10,6 +9,8 @@ def login(email: str, password: str) -> None:
         st.switch_page(f"./pages/{user_type}.py")
     except AuthApiError:
         st.error("Invalid Credentials")
+    except AuthRetryableError:
+        st.error("SSL handshake timed out. Please try again.")
 
 def register(email: str, password: str) -> None:
     try:
@@ -26,3 +27,16 @@ def register(email: str, password: str) -> None:
 
 def save_token(token):
     st.session_state['token'] = token
+
+def check_token():
+    if 'token' not in st.session_state:
+        st.switch_page("./login.py")
+        st.toast("you need to login")
+        return
+    return
+
+    
+
+
+    
+
