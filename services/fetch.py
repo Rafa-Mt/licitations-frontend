@@ -72,10 +72,9 @@ def get_licitations():
     user_id = supabase.auth.get_user(st.session_state['token']).user.id
     result = supabase.table("applications") \
         .select('title, description, file_dir, aes_key_dir, state_id, state(state_id: id), user_id, auth.users(user_id: id)') \
-        .eq("user_id", user_id) \
         .execute()
     
     print(result)
-    return result.get('data')
+    return result["data"]
 
 
